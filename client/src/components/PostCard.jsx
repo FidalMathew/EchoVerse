@@ -1,10 +1,7 @@
 import moment from 'moment';
 import { Link } from "react-router-dom";
-// import { grpahCMSImageLoader } from '../util';
 
 import PropTypes from 'prop-types';
-
-
 
 
 const PostCard = ({ post }) => {
@@ -19,17 +16,15 @@ const PostCard = ({ post }) => {
             <h1 className="transition duration-700 text-start mb-8 cursor-pointer hover:text-pink-600 text-3xl font-semibold">
                 <Link to={`/post/${post.slug}`}>{post.title}</Link>
             </h1>
+            <div className='w-full text-start px-2 pb-8'>
+                {post.tags.map((tag, index) => (
+                    <>
+                        <span key={index} className="text-xs bg-pink-200 text-gray-700 font-medium px-2 py-1 rounded-full mr-2">{tag}</span>
+                    </>
+                ))}
+            </div>
             <div className="block lg:flex text-start items-center justify-start mb-8 w-full">
                 <div className="flex justify-center mb-4 lg:mb-0 w-full lg:w-auto mr-8 items-center">
-                    {/* <Image
-                    unoptimized
-                    // loader={grpahCMSImageLoader}
-                    alt={post.author.name}
-                    height="30px"
-                    width="30px"
-                    className="align-middle rounded-full"
-                    src={post.author.photo.url}
-                /> */}
                     <img src={post.author.photo.url} alt={post.author.name} className="align-middle rounded-full h-10 w-10" />
                     <p className="inline align-middle text-gray-700 ml-2 font-medium ">{post.author.name}</p>
                 </div>
