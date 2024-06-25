@@ -1,4 +1,4 @@
-import React from 'react'
+import { useContext } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
@@ -8,11 +8,23 @@ import {
   Route,
   Link,
 } from "react-router-dom";
+import { EchoVerseProvider, EchoVerseContext } from "./context/contractContext.jsx"
+
+import Connect from './pages/Connect.jsx';
+
+
+// eslint-disable-next-line react-refresh/only-export-components
+const Home = () => {
+  const { currentAccount } = useContext(EchoVerseContext);
+  // const currentAccount = "0x1234567890";
+  console.log("currentAccount", currentAccount)
+  return (currentAccount ? <App /> : <Connect />);
+}
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (<App />),
+    element: (<Home />),
   },
   {
     path: "about",
@@ -22,5 +34,7 @@ const router = createBrowserRouter([
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
+  <EchoVerseProvider>
+    <RouterProvider router={router} />
+  </EchoVerseProvider>
 )

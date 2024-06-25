@@ -4,10 +4,12 @@ import Categories from './components/Categories'
 
 import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { EchoVerseContext } from './context/contractContext';
 
 function App() {
 
+  const { currentAccount } = useContext(EchoVerseContext)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const staticPosts = [
     {
@@ -135,9 +137,16 @@ function App() {
 
   return (
     <>
-      <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
-        EchoVerse
-      </h1>
+      <div className='flex items-center justify-between pb-5 static'>
+        <div></div>
+        <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
+          EchoVerse
+        </h1>
+        <div className="flex items-center justify-center bg-pink-600 text-white px-4 py-2 rounded-full"
+        >{
+            currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4)
+          }</div>
+      </div>
 
       <h3 className="text-center font-semibold text-lg  text-gray-800 mb-8">
         Anonymous stories, empowered by community and AI 🌍 <br />

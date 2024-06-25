@@ -18,9 +18,7 @@ const PostCard = ({ post }) => {
             </h1>
             <div className='w-full text-start px-2 pb-8'>
                 {post.tags.map((tag, index) => (
-                    <>
-                        <span key={index} className="text-xs bg-pink-200 text-gray-700 font-medium px-2 py-1 rounded-full mr-2">{tag}</span>
-                    </>
+                    <span key={index} className="text-xs bg-pink-200 text-gray-700 font-medium px-2 py-1 rounded-full mr-2">{tag}</span>
                 ))}
             </div>
             <div className="block lg:flex text-start items-center justify-start mb-8 w-full">
