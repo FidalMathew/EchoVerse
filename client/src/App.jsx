@@ -135,7 +135,7 @@ function App() {
 
   return (
     <>
-      <h1 className="text-4xl font-extrabold text-gray-800 pb-2 px-6 ">
+      <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
         EchoVerse
       </h1>
 
