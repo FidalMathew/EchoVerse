@@ -140,12 +140,20 @@ function App() {
       </h1>
 
       <h3 className="text-center font-semibold text-lg  text-gray-800 mb-8">
-        Anonymous stories, empowered by community and AI 🌍 <br /> Share your voice without revealing your identity.
+        Anonymous stories, empowered by community and AI 🌍 <br />
+        Share your voice without revealing your identity.
+        <span className='text-pink-600 px-2 cursor-pointer'>
+          Share your Story!
+        </span>
       </h3>
+
 
       <div className="container mx-auto px-10 mb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 px-10">
           <div className="lg:col-span-8 col-span-1">
+            <h3 className='text-3xl pb-8 font-bold'>
+              Latest Stories
+            </h3>
             {posts.map((post, index) => (
               <PostCard key={index} post={post} />
             ))}
