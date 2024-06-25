@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract BlogPlatform {
+contract EchoVerse {
     uint public postCount = 0;
     uint public replyCount = 0;
 
