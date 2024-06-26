@@ -151,11 +151,12 @@ export const EchoVerseProvider = ({ children }) => {
     }, [chainId, currentAccount])
 
 
+    const backendURL = "http://localhost:8000";
 
     return (
         <EchoVerseContext.Provider
             value={{
-                chainId, currentAccount, echoVerseContract, errorPage, switchNetwork, connectWallet, contractAddress
+                chainId, backendURL, currentAccount, echoVerseContract, errorPage, switchNetwork, connectWallet, contractAddress
             }}
         >
             {children}

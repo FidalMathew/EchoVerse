@@ -1,180 +1,169 @@
 import './App.css'
 import PostCard from './components/PostCard'
 import Categories from './components/Categories'
-
+import moment from 'moment';
 import { createAvatar } from '@dicebear/core';
 import { lorelei } from '@dicebear/collection';
 import { useContext, useEffect, useState } from 'react';
 import { EchoVerseContext } from './context/contractContext';
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import axios from 'axios';
 
 function App() {
 
-  const { currentAccount } = useContext(EchoVerseContext)
+  const { currentAccount, echoVerseContract, backendURL } = useContext(EchoVerseContext)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const staticPosts = [
-    {
-      title: "Excepteur sint occaecat cupidatat non proident",
-      slug: "excepteur-sint-occaecat-cupidatat-non-proident",
-      featuredImage: {
-        url: "https://via.placeholder.com/600x400"
-      },
-      author: {
-        name: "Jane Doe",
-        photo: {
-          url: "https://via.placeholder.com/150"
-        }
-      },
-      createdAt: "2023-03-18T14:32:04.019Z",
-      excerpt: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      tags: ["Lifestyle", "Health", "Wellness"]
-    },
-    {
-      title: "Sed ut perspiciatis unde omnis iste natus",
-      slug: "sed-ut-perspiciatis-unde-omnis-iste-natus",
-      featuredImage: {
-        url: "https://via.placeholder.com/600x400"
-      },
-      author: {
-        name: "John Smith",
-        photo: {
-          url: "https://via.placeholder.com/150"
-        }
-      },
-      createdAt: "2022-11-22T11:14:33.019Z",
-      excerpt: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      tags: ["Business", "Finance", "Economy"]
-    },
-    {
-      title: "At vero eos et accusamus et iusto odio dignissimos",
-      slug: "at-vero-eos-et-accusamus-et-iusto-odio-dignissimos",
-      featuredImage: {
-        url: "https://via.placeholder.com/600x400"
-      },
-      author: {
-        name: "Alice Johnson",
-        photo: {
-          url: "https://via.placeholder.com/150"
-        }
-      },
-      createdAt: "2021-07-30T07:55:12.019Z",
-      excerpt: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.",
-      tags: ["Law", "Justice", "Ethics"]
-    },
-    {
-      title: "Nemo enim ipsam voluptatem quia voluptas",
-      slug: "nemo-enim-ipsam-voluptatem-quia-voluptas",
-      featuredImage: {
-        url: "https://via.placeholder.com/600x400"
-      },
-      author: {
-        name: "Bob Brown",
-        photo: {
-          url: "https://via.placeholder.com/150"
-        }
-      },
-      createdAt: "2023-01-15T22:45:22.019Z",
-      excerpt: "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.",
-      tags: ["Technology", "Innovation", "Gadgets"]
-    },
-    {
-      title: "Neque porro quisquam est qui dolorem",
-      slug: "neque-porro-quisquam-est-qui-dolorem",
-      featuredImage: {
-        url: "https://via.placeholder.com/600x400"
-      },
-      author: {
-        name: "Charlie Davis",
-        photo: {
-          url: "https://via.placeholder.com/150"
-        }
-      },
-      createdAt: "2022-05-08T09:25:42.019Z",
-      excerpt: "Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.",
-      tags: ["Philosophy", "History", "Culture"]
-    }
-  ];
 
   const [posts, setPosts] = useState([]);
+  const [isOpen, setIsOpen] = useState(false)
+
+
+  function close() {
+    setIsOpen(false)
+  }
 
   useEffect(() => {
-    const fetchPosts = () => {
-      console.log("Fetching posts...", staticPosts.length);
-      const tempPosts = staticPosts.map((post) => {
+    const fetchPosts = async () => {
 
-        const tempPost = {};
+      const res = await echoVerseContract.getAllPosts();
+      console.log(res)
+
+      let noOfPosts = res[0].length;
+      let tempPosts = [];
+
+      for (let i = 0; i < noOfPosts; i++) {
+
+        let tempPost = {};
+
+        tempPost.id = Number(res[0][i]._hex).toString();
+        tempPost.owner = res[1][i];
+        tempPost.title = res[2][i];
+        tempPost.content = res[3][i];
+        tempPost.tags = res[4][i];
+
+        const hexValue = res[5][i]._hex;
+        let decimalValue = parseInt(hexValue, 16);
+        tempPost.createdAt = moment.unix(decimalValue).utc().format('MMM DD, YYYY');
+
         const avatar = createAvatar(lorelei, {
-          seed: post.author.name,
         });
-
         const dataUri = avatar.toDataUri();
+        tempPost.photo = dataUri.toString();
 
-        tempPost.title = post.title;
-        tempPost.slug = post.slug;
-        tempPost.featuredImage = {
-          url: post.featuredImage.url
-        };
-
-        tempPost.author = {
-          name: post.author.name,
-          photo: {
-            url: dataUri
-          }
-        };
-
-        tempPost.createdAt = post.createdAt;
-        tempPost.excerpt = post.excerpt;
-        tempPost.tags = post.tags;
-
-        return tempPost;
-
-      })
+        console.log(tempPost, "tempPost");
+        tempPosts.push(tempPost);
+      }
 
       setPosts(tempPosts);
     }
-    fetchPosts();
-  }, [])
 
+    if (echoVerseContract)
+      fetchPosts();
+  }, [echoVerseContract])
+
+
+  const [postTitle, setPostTitle] = useState('')
+  const [postContent, setPostContent] = useState('')
+
+  const handleCreateNewPost = async () => {
+
+    try {
+      console.log("Creating new post...");
+
+      if (postTitle === '' || postContent === '') {
+        alert('Please fill in all fields')
+        return
+      }
+
+      console.log(postTitle, postContent, echoVerseContract)
+      const res = await axios.post(`${backendURL}/tags`, {
+        postContent: postContent
+      })
+      console.log(res.data)
+      const tags = res.data.tags
+      echoVerseContract.createPost(postTitle, postContent, tags)
+      setIsOpen(false)
+
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   return (
     <>
-      <div className='flex items-center justify-between pb-5 static'>
-        <div></div>
-        <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
-          EchoVerse
-        </h1>
-        <div className="flex items-center justify-center bg-pink-600 text-white px-4 py-2 rounded-full"
-        >{
-            currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4)
-          }</div>
-      </div>
+      <div>
+        <div className='flex items-center justify-between pb-5 static'>
+          <div></div>
+          <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
+            EchoVerse
+          </h1>
+          <div className="flex items-center justify-center bg-pink-600 text-white px-4 py-2 rounded-full"
+          >{
+              currentAccount.slice(0, 6) + "..." + currentAccount.slice(-4)
+            }</div>
+        </div>
 
-      <h3 className="text-center font-semibold text-lg  text-gray-800 mb-8">
-        Anonymous stories, empowered by community and AI 🌍 <br />
-        Share your voice without revealing your identity.
-        <span className='text-pink-600 px-2 cursor-pointer'>
-          Share your Story!
-        </span>
-      </h3>
+        <h3 className="text-center font-semibold text-lg  text-gray-800 mb-8">
+          Anonymous stories, empowered by community and AI 🌍 <br />
+          Share your voice without revealing your identity.
+          <span className='text-pink-600 px-2 cursor-pointer' onClick={() => setIsOpen(true)}>
+            Share your Story!
+          </span>
+        </h3>
 
 
-      <div className="container mx-auto px-10 mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 px-10">
-          <div className="lg:col-span-8 col-span-1">
-            <h3 className='text-3xl pb-8 font-bold'>
-              Latest Stories
-            </h3>
-            {posts.map((post, index) => (
-              <PostCard key={index} post={post} />
-            ))}
-          </div>
-          <div className="lg:col-span-4 col-span-1">
-            <div className="lg:sticky relative top-8">
-              {/* <PostWidget /> */}
-              <Categories />
+        <div className="container mx-auto px-10 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 px-10">
+            <div className="lg:col-span-8 col-span-1" onClick={() => setIsOpen(true)}>
+              <h3 className='text-3xl pb-8 font-bold'>
+                Latest Stories
+              </h3>
+              {posts.map((post, index) => (
+                <PostCard key={index} post={post} />
+              ))}
+            </div>
+            <div className="lg:col-span-4 col-span-1">
+              <div className="lg:sticky relative top-8">
+                {/* <PostWidget /> */}
+                <Categories />
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+        <DialogBackdrop className="fixed inset-0 bg-black/60" />
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <DialogPanel
+              transition
+              className=" w-3/4 rounded-xl bg-white p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+            >
+              <DialogTitle as="h3" className="text-lg font-semibold">
+                Share your Story
+              </DialogTitle>
+
+              <div className="mt-6">
+                <input type="text" className='w-full border border-gray-300 rounded-lg p-2 mb-4' placeholder='Title'
+                  onChange={(e) => setPostTitle(e.target.value)}
+                />
+                <textarea className='w-full border border-gray-300 rounded-lg p-2 mb-4' placeholder='Story' rows='5'
+                  onChange={(e) => setPostContent(e.target.value)}
+                ></textarea>
+
+                <div className='text-center'>
+                  <button className=' bg-pink-600 text-white px-4 py-2 rounded-lg' onClick={handleCreateNewPost}>
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
     </>
   )
 }

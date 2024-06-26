@@ -5,8 +5,6 @@ import './index.css'
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Link,
 } from "react-router-dom";
 import { EchoVerseProvider, EchoVerseContext } from "./context/contractContext.jsx"
 

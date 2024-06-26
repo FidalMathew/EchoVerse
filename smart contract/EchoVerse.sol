@@ -8,6 +8,7 @@ contract EchoVerse {
     struct Post {
         uint id;
         address author;
+        string title;
         string content;
         string[] tags;
         uint timestamp;
@@ -28,6 +29,7 @@ contract EchoVerse {
     event PostCreated(
         uint id,
         address author,
+        string title,
         string content,
         string[] tags,
         uint timestamp
@@ -40,11 +42,16 @@ contract EchoVerse {
         uint timestamp
     );
 
-    function createPost(string memory _content, string[] memory _tags) public {
+    function createPost(
+        string memory _title,
+        string memory _content,
+        string[] memory _tags
+    ) public {
         postCount++;
         posts[postCount] = Post(
             postCount,
             msg.sender,
+            _title,
             _content,
             _tags,
             block.timestamp
@@ -52,6 +59,7 @@ contract EchoVerse {
         emit PostCreated(
             postCount,
             msg.sender,
+            _title,
             _content,
             _tags,
             block.timestamp
@@ -83,11 +91,25 @@ contract EchoVerse {
     )
         public
         view
-        returns (uint, address, string memory, string[] memory, uint)
+        returns (
+            uint,
+            address,
+            string memory,
+            string memory,
+            string[] memory,
+            uint
+        )
     {
         require(_postId > 0 && _postId <= postCount, "Post does not exist");
         Post memory post = posts[_postId];
-        return (post.id, post.author, post.content, post.tags, post.timestamp);
+        return (
+            post.id,
+            post.author,
+            post.title,
+            post.content,
+            post.tags,
+            post.timestamp
+        );
     }
 
     function getReply(
@@ -116,12 +138,14 @@ contract EchoVerse {
             uint[] memory,
             address[] memory,
             string[] memory,
+            string[] memory,
             string[][] memory,
             uint[] memory
         )
     {
         uint[] memory ids = new uint[](postCount);
         address[] memory authors = new address[](postCount);
+        string[] memory titles = new string[](postCount);
         string[] memory contents = new string[](postCount);
         string[][] memory tagsArray = new string[][](postCount);
         uint[] memory timestamps = new uint[](postCount);
@@ -130,12 +154,13 @@ contract EchoVerse {
             Post memory post = posts[i];
             ids[i - 1] = post.id;
             authors[i - 1] = post.author;
+            titles[i - 1] = post.title;
             contents[i - 1] = post.content;
             tagsArray[i - 1] = post.tags;
             timestamps[i - 1] = post.timestamp;
         }
 
-        return (ids, authors, contents, tagsArray, timestamps);
+        return (ids, authors, titles, contents, tagsArray, timestamps);
     }
 
     function getPostWithReplies(
@@ -146,6 +171,7 @@ contract EchoVerse {
         returns (
             uint,
             address,
+            string memory,
             string memory,
             string[] memory,
             uint,
@@ -158,6 +184,7 @@ contract EchoVerse {
         return (
             post.id,
             post.author,
+            post.title,
             post.content,
             post.tags,
             post.timestamp,
