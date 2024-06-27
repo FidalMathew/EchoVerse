@@ -1,9 +1,11 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { EchoVerseContext } from "../context/contractContext";
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import moment from "moment";
 import { createAvatar } from "@dicebear/core";
 import { lorelei } from "@dicebear/collection";
+
+import backImg from '/back.png'
 
 function Post() {
 
@@ -65,7 +67,39 @@ function Post() {
             try {
 
                 const res = await echoVerseContract.getPostReplies(id);
-                console.log(res, "res")
+                console.log(res, "repponse")
+
+                const treplies = res.map(reply => Number(reply._hex));
+                console.log(treplies, "replies")
+
+                let tempReplies = [];
+
+                for (let i = 0; i < treplies.length; i++) {
+                    const res = await echoVerseContract.getReply(treplies[i]);
+                    console.log(res, "res")
+
+                    let tempReply = {};
+
+                    tempReply.id = Number(res[0]._hex).toString();
+                    tempReply.postId = res[1];
+                    tempReply.replier = res[2];
+                    tempReply.content = res[3];
+
+
+                    const hexValue = res[4]._hex;
+                    let decimalValue = parseInt(hexValue, 16);
+                    tempReply.createdAt = moment.unix(decimalValue).utc().format('MMM DD, YYYY');
+
+                    const avatar = createAvatar(lorelei, {
+                    });
+                    const dataUri = avatar.toDataUri();
+                    tempReply.photo = dataUri.toString();
+
+                    tempReplies.push(tempReply);
+                }
+
+                console.log(tempReplies, "tempReplies")
+                setReplies(tempReplies);
             } catch (error) {
                 console.log(error)
             }
@@ -82,6 +116,12 @@ function Post() {
     return (
         <>
             <div className="bg-white shadow-lg rounded-lg lg:p-8 pb-12 mb-8 ">
+                <div className="text-start px-28">
+                    {/* {back button} */}
+                    <Link to="/">
+                        <img src={backImg} alt="back" className="h-5 w-5" />
+                    </Link>
+                </div>
                 <div className="relative overflow-hidden shadow-md mb-6">
                     {/* <img src={post.featuredImage.url} alt="" className="object-top h-full w-full object-cover  shadow-lg rounded-t-lg lg:rounded-lg" /> */}
                 </div>
@@ -138,8 +178,8 @@ function Post() {
                         {
                             replies.map((reply, index) => {
                                 return (
-                                    <div key={index} className="mb-8">
-                                        <div className="flex items-center justify-between mb-8">
+                                    <div key={index} className="mb-8 border-4 border-pink-100 p-6 rounded-lg">
+                                        <div className="flex items-center justify-between mb-8 ">
                                             <div className="hidden md:flex items-center justify-center lg:mb-0 lg:w-auto mr-8 ">
                                                 <img
                                                     alt={reply.owner}
@@ -149,8 +189,10 @@ function Post() {
                                                     src={reply.photo}
                                                 />
                                                 {
-                                                    reply && reply.owner &&
-                                                    <p className="inline align-middle text-gray-700 ml-2 font-medium text-lg">{reply.owner.slice(0, 6) + "..." + reply.owner.slice(-4)}</p>
+                                                    reply && reply.replier &&
+                                                    <p className="inline align-middle text-gray-700 ml-2 font-medium ">
+                                                        {reply.replier.toLowerCase() === currentAccount.toLowerCase() ? "You" : reply.replier.slice(0, 6) + "..." + reply.replier.slice(-4)}
+                                                    </p>
                                                 }
                                             </div>
                                             <div className="font-medium text-gray-700">
