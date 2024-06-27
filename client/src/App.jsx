@@ -115,7 +115,7 @@ function App() {
 
         <div className="container mx-auto px-10 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 px-10">
-            <div className="lg:col-span-8 col-span-1" onClick={() => setIsOpen(true)}>
+            <div className="lg:col-span-8 col-span-1" >
               <h3 className='text-3xl pb-8 font-bold'>
                 Latest Stories
               </h3>

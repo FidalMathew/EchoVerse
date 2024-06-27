@@ -9,6 +9,7 @@ import {
 import { EchoVerseProvider, EchoVerseContext } from "./context/contractContext.jsx"
 
 import Connect from './pages/Connect.jsx';
+import Post from './pages/Post.jsx';
 
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
     path: "about",
     element: <div>About</div>,
   },
+  {
+    path: '/post/:id/',
+    element: (<Post />),
+  }
 ]);
 
 
