@@ -151,7 +151,7 @@ export const EchoVerseProvider = ({ children }) => {
     }, [chainId, currentAccount])
 
 
-    const backendURL = "http://localhost:8000";
+    const backendURL = "https://echoverse-94io.onrender.com";
 
     return (
         <EchoVerseContext.Provider
