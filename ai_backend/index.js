@@ -72,28 +72,12 @@ app.post("/tags", async (req, res) => {
   res.json({ tags: tagsArray }).status(200);
 });
 
-function formatAdviceContent(content) {
-  // Replace **text** with <strong>text</strong>
-  content = content.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-  // Replace * with <li> and wrap in <ul>
-  content = content.replace(/^\* (.*)$/gm, "<li>$1</li>");
-  content = "<ul>" + content + "</ul>";
-
-  // Replace \n\n with HTML paragraphs
-  content = content.replace(/\n\n/g, "</p><p>");
-
-  // Add HTML paragraph tags around the entire content
-  content = "<p>" + content + "</p>";
-
-  return content;
-}
-
 app.post("/advice", async (req, res) => {
   const { postContent, advice } = req.body;
 
+  console.log(postContent);
   const additionalText =
-    'Provide advice on the post content. The response should be in the format:- "advice": "Your advice goes here".';
+    'Provide advice on the post content. The response should be in the format:- "advice": "Your advice goes here". Respond with only 1 paragraph';
   const prompt = postContent + advice + additionalText;
 
   const chatSession = model.startChat({

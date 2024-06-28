@@ -22,6 +22,11 @@ function App() {
     setIsOpen(false)
   }
 
+  // fetch query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const category = urlParams.get('category');
+
+
   useEffect(() => {
     const fetchPosts = async () => {
 
@@ -120,7 +125,9 @@ function App() {
                 Latest Stories
               </h3>
               {posts.map((post, index) => (
-                <PostCard key={index} post={post} />
+                // JSON.stringify(post.tags)
+                category ? (post.tags.includes(category) && <PostCard key={index} post={post} />) :
+                  <PostCard key={index} post={post} />
               ))}
             </div>
             <div className="lg:col-span-4 col-span-1">
