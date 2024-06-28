@@ -97,7 +97,7 @@ function App() {
 
   return (
     <>
-      <div>
+      <div className='p-10'>
         <div className='flex items-center justify-between pb-5 static'>
           <div></div>
           <h1 className="text-5xl font-extrabold text-gray-800 pb-2 px-6 ">
