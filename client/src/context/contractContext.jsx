@@ -143,11 +143,9 @@ export const EchoVerseProvider = ({ children }) => {
 
     useEffect(() => {
 
-        if (chainId !== "0xf35a" || !currentAccount)
-            setErrorPage(true)
-        else
-            setErrorPage(false)
-
+        if (chainId !== "0xf35a") {
+            switchNetwork()
+        }
     }, [chainId, currentAccount])
 
 
